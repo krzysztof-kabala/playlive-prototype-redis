@@ -7,48 +7,61 @@ Array.prototype.sum = function() {
 
 class Queue {
     constructor() {
-        this.rsmq = new RedisSMQ( {host: "redis", port: 6379, ns: "rsmq"} );
-        this.queueName = 'playlive';
-        this.worker = new RSMQWorker( this.queueName, {interval:[.01],rsmq: this.rsmq} );
-        this.messageCount = 0;
-        this.messageTimes = [];
+        this.rsmq = new RedisSMQ( {
+            host: process.env.REDIS_HOST,
+            port: process.env.REDIS_PORT,
+            ns: process.env.REDIS_NAME
+        } );
+        this.queueName = process.env.REDIS_QUEUE;
+    }
+
+    createRedisWorker() {
+        return new RSMQWorker( this.queueName, {
+            interval: [.001, .01, .1, 1],
+            rsmq: this.rsmq
+        } );
+    }
+
+    async processMessage(jsonMessage) {
+        const eventArray = JSON.parse(jsonMessage);
+        eventArray.forEach((taskObject) => {
+            const dateDiff = Date.now() - taskObject.date;
+
+            console.log(dateDiff+'ms');
+        });
     }
 
     readRedisMessages() {
-        console.log(this.messageCount, this.messageTimes);
-        this.worker.on( "message", ( msg, next, id ) => {
-            const msgObject = JSON.parse(msg);
-            if (this.messageCount < 10) {
-                this.messageCount++;
-                this.messageTimes.push( Date.now()-msgObject.date );
-            } else {
-                const timeAvg = this.messageTimes.sum() / this.messageTimes.length;
-                console.log('processed '+this.messageCount+' messages, average time: '+timeAvg);
-                this.messageCount = 0;
-                this.messageTimes = [];
+        this.rsmq.receiveMessage({qname: this.queueName}, (err, resp) => {
+            if (resp && resp.hasOwnProperty('message')) {
+
+                const eventArray = JSON.parse(resp.message);
+                eventArray.forEach((taskObject) => {
+                    const dateDiff = Date.now() - taskObject.date;
+
+                    console.log(dateDiff+'ms');
+                });
+
+                this.deleteRedisMessage(resp.id);
             }
-
-            next();
         });
-
-        // optional error listeners
-        this.worker.on('error', function( err, msg ){
-            console.log( "ERROR", err, msg.id );
-        });
-        this.worker.on('exceeded', function( msg ){
-            console.log( "EXCEEDED", msg.id );
-        });
-        this.worker.on('timeout', function( msg ){
-            console.log( "TIMEOUT", msg.id, msg.rc );
-        });
-
-        this.worker.start();
     }
 
-    async sendRedisMessage() {
+    deleteRedisMessage(id) {
+        this.rsmq.deleteMessage({qname:this.queueName, id:id}, (err, resp) => {
+
+        });
+    }
+
+    async sendRedisMessage(events) {
+        let messageArray = [];
+        for (let i=0;i<events;i++) {
+            messageArray.push(this.createMessage());
+        }
+
         this.rsmq.sendMessage({
-            qname:this.queueName,
-            message: JSON.stringify(this.createMessage())
+            qname: this.queueName,
+            message: JSON.stringify(messageArray)
         }, function (err, resp) {
             // console.log(err, resp);
         });

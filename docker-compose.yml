@@ -17,6 +17,8 @@ services:
     build:
         context: ./
         dockerfile: ./docker/worker/Dockerfile
+    env_file:
+      - ./docker/worker/config.env
     networks:
       - global
     stdin_open: true
@@ -33,6 +35,8 @@ services:
     build:
         context: ./
         dockerfile: ./docker/app/Dockerfile
+    env_file:
+      - ./docker/app/config.env
     networks:
       - global
     stdin_open: true
