@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:4-alpine
+    container_name: redis.demo-app.playlive.docker
+    command: 'redis-server --save "" --appendonly no'
+    stdin_open: true
+    tty: true
+    networks:
+      - global
+    restart: always
+
+  worker:
+    image: amsdard.io/exmachina/playlive-demo-worker:2.0
+    container_name: worker.demo-app.playlive.docker
+    build:
+        context: ./
+        dockerfile: ./docker/worker/Dockerfile
+    networks:
+      - global
+    stdin_open: true
+    tty: true
+    volumes:
+       - ./:/usr/src/app:cached
+    links:
+       - redis
+    restart: always
+
+  app:
+    image: amsdard.io/exmachina/playlive-demo-app:2.0
+    container_name: demo-app.playlive.docker
+    build:
+        context: ./
+        dockerfile: ./docker/app/Dockerfile
+    networks:
+      - global
+    stdin_open: true
+    tty: true
+    labels:
+       traefik.frontend.rule: "Host:{subdomain}.playlive-test-app.test,playlive-test-app.test"
+    volumes:
+       - ./:/usr/src/app:cached
+    links:
+       - redis
+    restart: always
+
+networks:
+  global:
+    external: true

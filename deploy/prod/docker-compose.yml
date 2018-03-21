@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  app:
+    image: amsdard.io/exmachina/playlive-demo-app:1.0
+    container_name: demo-app.playlive.docker
+    networks:
+      - global
+    stdin_open: true
+    tty: true
+    labels:
+       traefik.frontend.rule: "Host:playlive-test-app.test"
+    restart: always
+
+networks:
+  global:
+    external: true

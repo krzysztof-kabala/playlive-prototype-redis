@@ -1,0 +1,7 @@
+/.idea/
+/node_modules/
+
+###> amsdard/symfony-as-docker ###
+/docker/*/*.env
+/composer.phar
+###< amsdard/symfony-as-docker ###

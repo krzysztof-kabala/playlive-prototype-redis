@@ -1,0 +1,36 @@
+app: docker-compose exec app $CMD
+
+# aliases
+npm: $BIN app npm $CMD
+
+# Up project.
+up:
+  - docker-compose up -d --force-recreate $CMD
+
+# Deletes all project containers.
+down: docker-compose down -v --rmi=all $CMD
+
+# List all project containers.
+ps: docker-compose ps $CMD
+
+# build container `yake build php`
+build: docker-compose build --pull $CMD
+
+# prepare & build & push to hub.amsdard.io, ie: `yake deploy php`
+deploy:
+  - $BIN build $CMD
+  - docker-compose push $CMD
+
+install:
+  - $BIN npm install
+
+# Seeds database with sample user and site - for one time use per deployment.
+populate:
+
+# Fresh installation process - to be run one time
+configure:
+
+# default values
+_config:
+  FORCE_ALL: 1
+  ENV: dev

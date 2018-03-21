@@ -1,0 +1,10 @@
+# Up project.
+up:
+  - docker-compose up -d --force-recreate $CMD
+
+restart:
+  - docker-compose pull --parallel --quiet
+  - $BIN up
+
+_config:
+  FORCE_ALL: 1
