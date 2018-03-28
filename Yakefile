@@ -31,6 +31,7 @@ populate:
 configure:
   - cp ./docker/app/config.env.dist ./docker/app/config.env
   - cp ./docker/worker/config.env.dist ./docker/worker/config.env
+  - cp ./docker/postgres/config.env.dist ./docker/postgres/config.env
 
 # default values
 _config:

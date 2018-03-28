@@ -11,6 +11,19 @@ services:
       - global
     restart: always
 
+  postgres:
+    image: postgres:9
+    container_name: postgres.demo-app.playlive.docker
+    env_file:
+      - ./docker/postgres/config.env
+    stdin_open: true
+    tty: true
+    volumes:
+      - ~/data/postgres.demo-app.playlive.docker:/var/lib/postgresql/data
+    networks:
+      - global
+    restart: always
+
   worker:
     image: amsdard.io/exmachina/playlive-demo-worker:2.0
     container_name: worker.demo-app.playlive.docker
@@ -26,6 +39,7 @@ services:
     volumes:
        - ./:/usr/src/app:cached
     links:
+       - postgres
        - redis
     restart: always
 
@@ -46,6 +60,7 @@ services:
     volumes:
        - ./:/usr/src/app:cached
     links:
+       - postgres
        - redis
     restart: always
 

@@ -1,10 +1,49 @@
 let express = require('express');
 let router = express.Router();
 let queue = require('../service/queue');
+let db = require('../service/db');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.json({status:200});
+});
+
+router.get('/fillDb', function(req, res, next) {
+/*    [...Array(100).keys()].forEach(i => {
+        const randomI = Math.floor((Math.random() * 10) + 1);
+        db.findBroadcast({'name':'broadcast'+randomI}).then(b => {
+            db.findEvent({broadcastuniqueid: b.uniqueid}).then(e => {
+                [...Array(5).keys()].forEach(ai => {
+                    db.createEventAggregation({
+                        eventuniqueid: e.uniqueid,
+                        name: 'answer'+(ai+1),
+                        type: (ai+1)
+                    });
+                });
+            });
+        });
+    });*/
+
+/*    [...Array(100).keys()].forEach(i => {
+        const randomI = Math.floor((Math.random() * 10) + 1);
+        db.findBroadcast({'name':'broadcast'+randomI}).then(b => {
+            db.createEvent({
+                broadcastuniqueid: b.uniqueid,
+                postid: 'post'+(i+1)
+            });
+        });
+    });*/
+
+/*
+    [...Array(10).keys()].forEach(i => {
+        db.createBroadcast({
+            name: 'broadcast'+(i+1),
+            status: 1,
+            postid: 'postid'+(i+1)
+        });
+    });*/
+
+    res.json({status: 200});
 });
 
 router.get('/:max', function(req, res, next) {
@@ -16,5 +55,6 @@ router.get('/:max', function(req, res, next) {
 
   res.json({status: 200, sum: sum});
 });
+
 
 module.exports = router;

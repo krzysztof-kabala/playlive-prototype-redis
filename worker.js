@@ -1,18 +1,36 @@
 #!/usr/bin/env node
 let program = require('commander');
 let queue = require('./service/queue');
+let db = require('./service/db');
+let cache = require('memory-cache');
 
 program
     .version('2.0')
     .option('-w, --workers', 'Number of workers')
     .parse(process.argv);
 
+
+
+let collectedItems = {broadcasts: 0, events: 0};
+db.getBroadcasts().then(broadcasts => {
+    broadcasts.forEach(b => {
+        cache.put(b.uniqueid, JSON.stringify(b));
+        ++collectedItems['broadcasts'];
+    });
+});
+db.getEvents().then(events => {
+    events.forEach(e => {
+        cache.put(e.postid, JSON.stringify(e));
+        ++collectedItems['events'];
+    });
+});
+
 console.log('start reading queue');
 
-const workersNumber = parseInt(process.env.WORKERS || 10, 10);
+const workersNumber = parseInt(process.env.WORKERS || 1, 10);
 let workers = [];
 
-for (let i in [...Array(workersNumber).keys()]) {
+[...Array(workersNumber).keys()].forEach(i => {
     workers[i] = queue.createRedisWorker();
 
     workers[i].on( "message", ( msg, next, id ) => {
@@ -32,4 +50,5 @@ for (let i in [...Array(workersNumber).keys()]) {
     });
 
     workers[i].start();
-}
+    console.log('worker '+(i+1)+' created!');
+});

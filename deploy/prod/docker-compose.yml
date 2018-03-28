@@ -1,16 +1,6 @@
 version: '3'
 
 services:
-  redis:
-    image: redis:4-alpine
-    container_name: redis.demo-app.playlive.docker
-    command: 'redis-server --save "" --appendonly no'
-    stdin_open: true
-    tty: true
-    networks:
-      - global
-    restart: always
-
   worker:
     image: amsdard.io/exmachina/playlive-demo-worker:2.0
     container_name: worker.demo-app.playlive.docker
@@ -19,12 +9,15 @@ services:
       - REDIS_PORT=6379
       - REDIS_NAME=queue
       - REDIS_QUEUE=playlive
+      - WORKERS=1
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=db
+      - POSTGRES_PASSWORD=12345
     networks:
       - global
     stdin_open: true
     tty: true
-    links:
-       - redis
     restart: always
 
   app:
@@ -36,12 +29,14 @@ services:
       - REDIS_PORT=6379
       - REDIS_NAME=queue
       - REDIS_QUEUE=playlive
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=db
+      - POSTGRES_PASSWORD=12345
     networks:
       - global
     stdin_open: true
     tty: true
-    links:
-       - redis
     restart: always
 
 networks:

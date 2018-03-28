@@ -11,6 +11,7 @@ COPY ./bin $WORKDIR/bin
 COPY ./public $WORKDIR/public
 COPY ./routes $WORKDIR/routes
 COPY ./views $WORKDIR/views
+COPY ./service $WORKDIR/service
 
 COPY ./app.js $WORKDIR/
 COPY package*.json $WORKDIR/
