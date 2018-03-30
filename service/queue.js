@@ -128,11 +128,11 @@ class Queue {
                 const votes = participations[postid][typeid];
                 const updateSql = "UPDATE eventaggregation SET participations = participations + {0} WHERE eventuniqueid = '{1}' AND type = '{2}' "
                     .format(votes, e.uniqueid, typeid);
-                db.getConnection().raw(updateSql).then(() => {
+                /*db.getConnection().raw(updateSql).then(() => {
                     console.log(updateSql);
                 }).catch(function(err) {
                     console.error(err);
-                });
+                });*/
             })
         });
     }

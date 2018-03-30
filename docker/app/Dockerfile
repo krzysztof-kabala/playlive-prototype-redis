@@ -1,4 +1,4 @@
-FROM node:9
+FROM node:8
 
 ENV WORKDIR=/usr/src/app
 

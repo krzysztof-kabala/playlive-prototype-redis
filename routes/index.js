@@ -2,6 +2,7 @@ let express = require('express');
 let router = express.Router();
 let queue = require('../service/queue');
 let db = require('../service/db');
+let fs = require('fs');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -46,14 +47,20 @@ router.get('/fillDb', function(req, res, next) {
     res.json({status: 200});
 });
 
+router.get('/version', function(req, res, next) {
+    fs.readFile('/builddate', "utf8", (err, data) => {
+        res.json({status: 200, date: data});
+    });
+});
+
 router.get('/:max', function(req, res, next) {
-  let max = parseInt(req.params.max, 10);
-  max = max <=0 ? 1 : max;
+    let max = parseInt(req.params.max, 10);
+    max = max <=0 ? 1 : max;
 
-  let sum = 0;
-  for (let i=0; i<max; i++) { sum += i; }
+    let sum = 0;
+    for (let i=0; i<max; i++) { sum += i; }
 
-  res.json({status: 200, sum: sum});
+    res.json({status: 200, sum: sum});
 });
 
 
